@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kynay Chat — Supreme Edition</title>
+    
+    <!-- CDN Libraries -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        dark: {
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155',
+                            600: '#475569',
+                            500: '#64748b',
+                        },
+                        light: {
+                            100: '#f8fafc',
+                            200: '#f1f5f9',
+                            300: '#e2e8f0',
+                            400: '#cbd5e1',
+                            500: '#94a3b8',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <!-- Day.js -->
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/relativeTime.js"></script>
+    <script>dayjs.extend(window.dayjs_plugin_relativeTime)</script>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Emoji Picker -->
+    <script src="https://cdn.jsdelivr.net/npm/@emoji-mart/data"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emoji-mart/js"></script>
+    
+    <!-- Howler.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    
+    <style type="text/css">
+        :root {
+            --primary-color: #0ea5e9;
+            --secondary-color: #22c55e;
+            --dark-bg: #0f172a;
+            --dark-secondary: #1e293b;
+            --light-bg: #f8fafc;
+            --light-secondary: #f1f5f9;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .dark ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .dark ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Chat bubble animations */
+        .message-enter {
+            animation: fadeIn 0.3s ease-in-out, slideUp 0.3s ease-out;
+        }
+        
+        /* Typing indicator animation */
+        @keyframes typingPulse {
+            0%, 100% {
+                opacity: 0.5;
+                transform: scale(0.95);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .typing-indicator span {
+            animation: typingPulse 1.5s infinite ease-in-out;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        /* Shimmer effect for loading */
+        .shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite linear;
+        }
+        
+        .dark .shimmer {
+            background: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%);
+            background-size: 200% 100%;
+        }
+        
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        
+        /* Pulse animation for online status */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+        .online-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Custom checkbox */
+        .checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        
+        .checkbox-checkmark {
+            position: relative;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background-color: #fff;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .dark .checkbox-checkmark {
+            background-color: #1e293b;
+            border-color: #475569;
+        }
+        
+        .checkbox-container input:checked ~ .checkbox-checkmark {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .checkbox-checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        
+        .checkbox-container input:checked ~ .checkbox-checkmark:after {
+            display: block;
+        }
+        
+        /* Message context menu */
+        .context-menu {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.2s ease;
+            pointer-events: none;
+        }
+        
+        .context-menu.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
+        }
+        
+        /* Modal overlay */
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Input focus effect */
+        .input-focus-effect:focus {
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.5);
+        }
+        
+        /* Button hover effect */
+        .btn-hover-effect:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-hover-effect:active {
+            transform: translateY(0);
+        }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(90deg, #0ea5e9, #22c55e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Notification badge */
+        .notification-badge {
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9);
+        }
+        
+        .dark .notification-badge {
+            box-shadow: 0 0 0 2px var(--dark-secondary);
+        }
+        
+        /* Avatar glow for online users */
+        .avatar-glow {
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+        
+        /* Ripple effect */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.7);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+        
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .chat-container {
+                grid-template-columns: 0 1fr;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                position: absolute;
+                z-index: 40;
+                width: 80%;
+                height: 100%;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .mobile-menu-button {
+                display: block;
+            }
+        }
+        
+        /* Message bubble triangle */
+        .message-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+        
+        .current-user .message-bubble::after {
+            right: -8px;
+            border-width: 0 0 12px 12px;
+            border-color: transparent transparent var(--primary-color) transparent;
+        }
+        
+        .other-user .message-bubble::after {
+            left: -8px;
+            border-width: 0 12px 12px 0;
+            border-color: transparent #fff transparent transparent;
+        }
+        
+        .dark .other-user .message-bubble::after {
+            border-color: transparent #1e293b transparent transparent;
+        }
+    </style>
+</head>
+<body class="dark:bg-dark-900 bg-light-100 text-dark-900 dark:text-light-100 transition-colors duration-300 h-full">
+    <!-- Main Container -->
+    <div class="flex flex-col h-full">
+        <!-- Header -->
+        <header class="bg-primary-600 dark:bg-dark-800 text-white shadow-lg z-30">
+            <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <button id="mobileMenuButton" class="md:hidden text-white focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-secondary-500 flex items-center justify-center">
+                            <i class="fas fa-comment-dots text-white text-lg"></i>
+                        </div>
+                        <h1 class="ml-3 text-xl font-bold gradient-text">Kynay Chat <span class="text-xs bg-white/20 px-2 py-1 rounded-full ml-2">Supreme Edition</span></h1>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button id="newChatButton" class="p-2 rounded-full hover:bg-white/10 transition-colors">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button id="darkModeToggle" class="p-2 rounded-full hover:bg-white/10 transition-colors">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:block"></i>
+                    </button>
+                    <div id="userDropdown" class="relative">
+                        <button id="userMenuButton" class="flex items-center space-x-2 focus:outline-none">
+                            <div id="currentUserAvatar" class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                <i class="fas fa-user text-gray-600"></i>
+                            </div>
+                            <span id="currentUserName" class="font-medium hidden md:inline">Guest</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        
+                        <div id="userDropdownMenu" class="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-800 rounded-md shadow-lg py-1 z-50 hidden">
+                            <div class="px-4 py-2 border-b border-gray-200 dark:border-dark-700">
+                                <p class="text-sm font-medium">Signed in as</p>
+                                <p id="dropdownUserName" class="text-sm truncate">Guest</p>
+                            </div>
+                            <a href="#" id="profileLink" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-dark-700">Your Profile</a>
+                            <a href="#" id="settingsLink" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-dark-700">Settings</a>
+                            <div class="border-t border-gray-200 dark:border-dark-700"></div>
+                            <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-dark-700">Sign out</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Sidebar -->
+            <aside id="sidebar" class="w-80 bg-white dark:bg-dark-800 border-r border-gray-200 dark:border-dark-700 flex flex-col transition-transform duration-300 ease-in-out">
+                <!-- Search Bar -->
+                <div class="p-3 border-b border-gray-200 dark:border-dark-700">
+                    <div class="relative">
+                        <input id="searchContacts" type="text" placeholder="Search contacts..." 
+                               class="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-100 dark:bg-dark-700 border-none focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200">
+                        <div class="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tabs -->
+                <div class="flex border-b border-gray-200 dark:border-dark-700">
+                    <button id="privateChatTab" class="flex-1 py-3 font-medium text-center border-b-2 border-primary-500 text-primary-600 dark:text-primary-400">
+                        <i class="fas fa-user-friends mr-2"></i> Chats
+                    </button>
+                    <button id="groupChatTab" class="flex-1 py-3 font-medium text-center border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                        <i class="fas fa-users mr-2"></i> Groups
+                    </button>
+                </div>
+                
+                <!-- Contacts List -->
+                <div id="contactsList" class="flex-1 overflow-y-auto">
+                    <!-- Loading state -->
+                    <div id="contactsLoading" class="p-4 space-y-3">
+                        <div class="flex items-center space-x-3 p-2">
+                            <div class="shimmer w-10 h-10 rounded-full"></div>
+                            <div class="flex-1 space-y-2">
+                                <div class="shimmer h-4 w-3/4 rounded"></div>
+                                <div class="shimmer h-3 w-1/2 rounded"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 p-2">
+                            <div class="shimmer w-10 h-10 rounded-full"></div>
+                            <div class="flex-1 space-y-2">
+                                <div class="shimmer h-4 w-3/4 rounded"></div>
+                                <div class="shimmer h-3 w-1/2 rounded"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 p-2">
+                            <div class="shimmer w-10 h-10 rounded-full"></div>
+                            <div class="flex-1 space-y-2">
+                                <div class="shimmer h-4 w-3/4 rounded"></div>
+                                <div class="shimmer h-3 w-1/2 rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Empty state -->
+                    <div id="contactsEmpty" class="hidden flex-col items-center justify-center p-8 text-center text-gray-500 dark:text-gray-400">
+                        <div class="w-16 h-16 bg-gray-100 dark:bg-dark-700 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-user-friends text-2xl"></i>
+                        </div>
+                        <h3 class="font-medium mb-1">No contacts yet</h3>
+                        <p class="text-sm">Start a new conversation by clicking the + button</p>
+                    </div>
+                    
+                    <!-- Contacts will be populated here -->
+                </div>
+                
+                <!-- User Status -->
+                <div class="p-3 border-t border-gray-200 dark:border-dark-700 bg-gray-50 dark:bg-dark-900/50">
+                    <div id="currentUserStatus" class="flex items-center">
+                        <div id="currentUserAvatarSmall" class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                            <i class="fas fa-user text-gray-600"></i>
+                        </div>
+                        <div class="ml-3 flex-1">
+                            <p id="currentUserNameSmall" class="font-medium text-sm">Guest User</p>
+                            <p id="currentUserPresence" class="text-xs text-gray-500 dark:text-gray-400">Offline</p>
+                        </div>
+                        <button id="statusToggle" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-dark-700">
+                            <i class="fas fa-ellipsis-h text-gray-500 dark:text-gray-400"></i>
+                        </button>
+                    </div>
+                </div>
+            </aside>
+            
+            <!-- Chat Area -->
+            <main class="flex-1 flex flex-col bg-gray-50 dark:bg-dark-900/50">
+                <!-- Chat Header -->
+                <div id="chatHeader" class="border-b border-gray-200 dark:border-dark-700 bg-white dark:bg-dark-800 p-3 flex items-center hidden">
+                    <button id="backToContacts" class="md:hidden mr-2 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-700">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div id="chatPartnerAvatar" class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                        <i class="fas fa-user text-gray-600"></i>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <div class="flex items-center">
+                            <h2 id="chatPartnerName" class="font-medium">Select a chat</h2>
+                            <div id="typingIndicator" class="ml-2 text-xs text-gray-500 dark:text-gray-400 hidden">
+                                <div class="typing-indicator flex items-center">
+                                    <span>typing</span>
+                                    <div class="flex ml-1 space-x-1">
+                                        <span class="w-1.5 h-1.5 bg-gray-500 dark:bg-gray-400 rounded-full"></span>
+                                        <span class="w-1.5 h-1.5 bg-gray-500 dark:bg-gray-400 rounded-full"></span>
+                                        <span class="w-1.5 h-1.5 bg-gray-500 dark:bg-gray-400 rounded-full"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p id="chatPartnerStatus" class="text-xs text-gray-500 dark:text-gray-400">last seen recently</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="chatInfoButton" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-700">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
+                        <button id="chatMenuButton" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-700">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Empty Chat State -->
+                <div id="emptyChatState" class="flex-1 flex flex-col items-center justify-center p-6 text-center">
+                    <div class="w-24 h-24 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/30 dark:to-secondary-900/30 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-comments text-3xl text-primary-600 dark:text-primary-400"></i>
+                    </div>
+                    <h3 class="text-xl font-medium mb-2">Welcome to Kynay Chat</h3>
+                    <p class="text-gray-500 dark:text-gray-400 max-w-md mb-6">Select a conversation from the sidebar or start a new chat to begin messaging.</p>
+                    <button id="startNewChatButton" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-200 flex items-center">
+                        <i class="fas fa-plus mr-2"></i> New Chat
+                    </button>
+                </div>
+                
+                <!-- Messages Container -->
+                <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 hidden">
+                    <div id="messagesList" class="space-y-3">
+                        <!-- Messages will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- Message Input -->
+                <div id="messageInputContainer" class="border-t border-gray-200 dark:border-dark-700 bg-white dark:bg-dark-800 p-3 hidden">
+                    <div class="flex items-center space-x-2">
+                        <button id="emojiPickerButton" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-700 text-gray-600 dark:text-gray-400">
+                            <i class="far fa-smile"></i>
+                        </button>
+                        <div class="flex-1 relative">
+                            <textarea id="messageInput" rows="1" placeholder="Type a message..." 
+                                      class="w-full max-h-32 py-2 px-3 bg-gray-100 dark:bg-dark-700 rounded-lg border-none focus:ring-2 focus:ring-primary-500 resize-none overflow-y-auto focus:outline-none transition-all duration-200"></textarea>
+                            <div id="messageInputPlaceholder" class="absolute top-2 left-3 text-gray-500 pointer-events-none hidden">Type a message...</div>
+                        </div>
+                        <button id="sendMessageButton" class="p-2 rounded-full bg-primary-600 hover:bg-primary-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        <div>
+                            <span id="messageStatus" class="hidden"><i class="fas fa-check-double text-primary-500 mr-1"></i> Delivered</span>
+                        </div>
+                        <div>
+                            <span id="messageLength">0/1000</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <!-- Auth Modal -->
+    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="modal-overlay absolute inset-0 bg-black/50"></div>
+        <div class="relative bg-white dark:bg-dark-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate__animated animate__fadeInUp">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 to-secondary-500"></div>
+            
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold">Welcome to Kynay Chat</h3>
+                    <button id="closeAuthModal" class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-dark-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div id="authTabs" class="flex border-b border-gray-200 dark:border-dark-700 mb-6">
+                    <button id="loginTab" class="flex-1 py-2 font-medium text-center border-b-2 border-primary-500 text-primary-600 dark:text-primary-400">Login</button>
+                    <button id="registerTab" class="flex-1 py-2 font-medium text-center border-b-2 border-transparent text-gray-500 dark:text-gray-400">Register</button>
+                </div>
+                
+                <!-- Login Form -->
+                <div id="loginForm" class="space-y-4">
+                    <div>
+                        <label for="loginEmail" class="block text-sm font-medium mb-1">Email</label>
+                        <input type="email" id="loginEmail" class="w-full px-3 py-2 bg-gray-100 dark:bg-dark-700 rounded-lg border-none focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200" placeholder="your@email.com">
+                    </div>
+                    <div>
+                        <label for="loginPassword" class="block text-sm font-medium mb-1">Password</label>
+                        <input type="password" id="loginPassword" class="w-full px-3 py-2 bg-gray-100 dark:bg-dark-700 rounded-lg border-none focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200" placeholder="••••••••">
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="rememberMe" class="mr-2">
+                            <label for="rememberMe" class="text-sm">Remember me</label>
+                        </div>
+                        <a href="#" id="forgotPassword" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Forgot password?</a>
+                    </div>
+                    <button id="loginButton" class="w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-200 font-medium">
+                        Sign In
+                    </button>
+                    <div class="text-center text-sm text-gray-500 dark:text-gray-400">
+                        Don't have an account? <a href="#" id="switchToRegister" class="text-primary-600 dark:text-primary-400 hover:underline">Sign up</a>
+                    </div>
+                </div>
+                
+                <!-- Register Form -->
+                <div id="registerForm" class="space-y-4 hidden">
+                    <div>
+                        <label for="registerName" class="block text-sm font-medium mb-1">Full Name</label>
+                        <input type="text" id="registerName" class="w-full px-3 py-2 bg-gray-100 dark:bg-dark-700 rounded-lg border-none focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200" placeholder="John Doe">
+                    </div>
+                    <div>
+                        <label for="registerEmail" class="block text-sm font-medium mb-1">Email</label>
+                        <input type="email" id="registerEmail" class="w-full px-3 py-2 bg-gray-100 dark:bg-dark-700 rounded-lg border-none focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200" placeholder="your@email.com">
+                    </div>
+                    <div>
+                        <label for="registerPassword" class="block text-sm font-medium mb-1">Password</label>
+                        <input type="password" id="registerPassword" class="w-full px-3 py-2 bg-gray-100 dark:bg-dark-700 rounded-lg border-none focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200" placeholder="••••••••">
+                    </div>
+                    <div>
+                        <label for="registerConfirmPassword" class="block text-sm font-medium mb-1">Confirm Password</label>
+                        <input type="password" id="registerConfirmPassword" class="w-full px-3 py-2 bg-gray-100 dark:bg-dark-700 rounded-lg border-none focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200" placeholder="••••••••">
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="acceptTerms" class="mr-2">
+                        <label for="acceptTerms" class="text-sm">I agree to the <a href="#" class="text-primary-600 dark:text-primary-400 hover:underline">Terms & Conditions</a></label>
+                    </div>
+                    <button id="registerButton" class="w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-200 font-medium">
+                        Create Account
+                    </button>
+                    <div class="text-center text-sm text-gray-500 dark:text-gray-400">
+                        Already have an account? <a href="#" id="switchToLogin" class="text-primary-600 dark:text-primary-400 hover:underline">Sign in</a>
+                    </div>
+                </div>
+                
+                <!-- Forgot Password Form -->
+                <div id="forgotPasswordForm" class="space-y-4 hidden">
+                    <p class="text-gray-600 dark:text-gray-300">Enter your email address and we'll send you a link to reset your password.</p>
+                    <div>
+                        <label for="forgotEmail" class="block text-sm font-medium mb-1">Email</label>
+                        <input type="email" id="forgotEmail" class="w-full px-3 py-2 bg-gray-100 dark:bg-dark-700 rounded-lg border-none focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200" placeholder="your@email.com">
+                    </div>
+                    <button id="resetPasswordButton" class="w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-200 font-medium">
+                        Send Reset Link
+                    </button>
+                    <div class="text-center">
+                        <a href="#" id="backToLogin" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Back to login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- New Chat Modal -->
+    <div id="newChatModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="modal-overlay absolute inset-0 bg-black/50"></div>
+        <div class="relative bg-white dark:bg-dark-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate__animated animate__fadeInUp">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 to-secondary-500"></div>
+            
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold">New Chat</h3>
+                    <button id="closeNewChatModal" class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-dark-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="relative">
+                        <input id="searchNewChat" type="text" placeholder="Search users..." 
+                               class="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-100 dark:bg-dark-700 border-none focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200">
+                        <div class="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="newChatUsersList" class="max-h-96 overflow-y-auto">
+                    <!-- Users will be populated here -->
+                    <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-users text-2xl mb-2"></i>
+                        <p>Search for users to start a new chat</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Message Context Menu -->
+    <div id="messageContextMenu" class="fixed z-50 bg-white dark:bg-dark-800 shadow-lg rounded-md py-1 w-48 border border-gray-200 dark:border-dark-700 hidden">
+        <button id="editMessageButton" class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-dark-700 text-sm flex items-center">
+            <i class="fas fa-edit mr-2"></i> Edit
+        </button>
+        <button id="deleteMessageButton" class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-dark-700 text-sm flex items-center">
+            <i class="fas fa-trash-alt mr-2"></i> Delete
+        </button>
+        <button id="copyMessageButton" class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-dark-700 text-sm flex items-center">
+            <i class="fas fa-copy mr-2"></i> Copy
+        </button>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
+        <div class="bg-white dark:bg-dark-800 p-6 rounded-xl shadow-xl flex flex-col items-center">
+            <div class="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p class="font-medium">Loading...</p>
+        </div>
+    </div>
+    
+    <!-- Notification Sound (hidden) -->
+    <audio id="notificationSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBMy7BQdsMvsXi_Efpgu9s2EPJjSI0bs2Y",
+            authDomain: "kynay-chat.firebaseapp.com",
+            projectId: "kynay-chat",
+            storageBucket: "kynay-chat.appspot.com",
+            messagingSenderId: "717386541195",
+            appId: "1:717386541195:web:f301e1278bb975d62d8c8e",
+            measurementId: "G-3Q62KNVRVL",
+            databaseURL: "https://kynay-chat-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        
+        // DOM Elements
+        const elements = {
+            // Auth Modal
+            authModal: document.getElementById('authModal'),
+            closeAuthModal: document.getElementById('closeAuthModal'),
+            loginTab: document.getElementById('loginTab'),
+            registerTab: document.getElementById('registerTab'),
+            loginForm: document.getElementById('loginForm'),
+            registerForm: document.getElementById('registerForm'),
+            forgotPasswordForm: document.getElementById('forgotPasswordForm'),
+            loginButton: document.getElementById('loginButton'),
+            registerButton: document.getElementById('registerButton'),
+            switchToRegister: document.getElementById('switchToRegister'),
+            switchToLogin: document.getElementById('switchToLogin'),
+            forgotPassword: document.getElementById('forgotPassword'),
+            resetPasswordButton: document.getElementById('resetPasswordButton'),
+            backToLogin: document.getElementById('backToLogin'),
+            
+            // Login Form Inputs
+            loginEmail: document.getElementById('loginEmail'),
+            loginPassword: document.getElementById('loginPassword'),
+            rememberMe: document.getElementById('rememberMe'),
+            
+            // Register Form Inputs
+            registerName: document.getElementById('registerName'),
+            registerEmail: document.getElementById('registerEmail'),
+            registerPassword: document.getElementById('registerPassword'),
+            registerConfirmPassword: document.getElementById('registerConfirmPassword'),
+            acceptTerms: document.getElementById('acceptTerms'),
+            
+            // Forgot Password
+            forgotEmail: document.getElementById('forgotEmail'),
+            
+            // Main App
+            darkModeToggle: document.getElementById('darkModeToggle'),
+            userMenuButton: document.getElementById('userMenuButton'),
+            userDropdownMenu: document.getElementById('userDropdownMenu'),
+            logoutButton: document.getElementById('logoutButton'),
+            currentUserAvatar: document.getElementById('currentUserAvatar'),
+            currentUserAvatarSmall: document.getElementById('currentUserAvatarSmall'),
+            currentUserName: document.getElementById('currentUserName'),
+            currentUserNameSmall: document.getElementById('currentUserNameSmall'),
+            currentUserStatus: document.getElementById('currentUserStatus'),
+            currentUserPresence: document.getElementById('currentUserPresence'),
+            dropdownUserName: document.getElementById('dropdownUserName'),
+            
+            // Sidebar
+            sidebar: document.getElementById('sidebar'),
+            mobileMenuButton: document.getElementById('mobileMenuButton'),
+            contactsList: document.getElementById('contactsList'),
+            contactsLoading: document.getElementById('contactsLoading'),
+            contactsEmpty: document.getElementById('contactsEmpty'),
+            searchContacts: document.getElementById('searchContacts'),
+            privateChatTab: document.getElementById('privateChatTab'),
+            groupChatTab: document.getElementById('groupChatTab'),
+            newChatButton: document.getElementById('newChatButton'),
+            startNewChatButton: document.getElementById('startNewChatButton'),
+            
+            // Chat Area
+            chatHeader: document.getElementById('chatHeader'),
+            backToContacts: document.getElementById('backToContacts'),
+            chatPartnerAvatar: document.getElementById('chatPartnerAvatar'),
+            chatPartnerName: document.getElementById('chatPartnerName'),
+            chatPartnerStatus: document.getElementById('chatPartnerStatus'),
+            typingIndicator: document.getElementById('typingIndicator'),
+            emptyChatState: document.getElementById('emptyChatState'),
+            messagesContainer: document.getElementById('messagesContainer'),
+            messagesList: document.getElementById('messagesList'),
+            messageInputContainer: document.getElementById('messageInputContainer'),
+            messageInput: document.getElementById('messageInput'),
+            messageInputPlaceholder: document.getElementById('messageInputPlaceholder'),
+            sendMessageButton: document.getElementById('sendMessageButton'),
+            emojiPickerButton: document.getElementById('emojiPickerButton'),
+            messageLength: document.getElementById('messageLength'),
+            messageStatus: document.getElementById('messageStatus'),
+            
+            // New Chat Modal
+            newChatModal: document.getElementById('newChatModal'),
+            closeNewChatModal: document.getElementById('closeNewChatModal'),
+            searchNewChat: document.getElementById('searchNewChat'),
+            newChatUsersList: document.getElementById('newChatUsersList'),
+            
+            // Context Menu
+            messageContextMenu: document.getElementById('messageContextMenu'),
+            editMessageButton: document.getElementById('editMessageButton'),
+            deleteMessageButton: document.getElementById('deleteMessageButton'),
+            copyMessageButton: document.getElementById('copyMessageButton'),
+            
+            // Loading
+            loadingOverlay: document.getElementById('loadingOverlay'),
+            
+            // Notification
+            notificationSound: document.getElementById('notificationSound')
+        };
+        
+        // App State
+        let state = {
+            currentUser: null,
+            darkMode: localStorage.getItem('darkMode') === 'true' || (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches),
+            activeChat: null,
+            activeChatType: null, // 'private' or 'group'
+            typingTimeout: null,
+            onlineStatus: true,
+            users: {},
+            chats: {},
+            groups: {},
+            messages: {},
+            userPresence: {},
+            typingStatus: {},
+            editingMessageId: null,
+            contextMenuMessageId: null
+        };
+        
+        // Initialize the app
+        function initApp() {
+            // Set dark mode if enabled
+            setDarkMode(state.darkMode);
+            
+            // Check auth state
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // User is signed in
+                    handleAuthSuccess(user);
+                } else {
+                    // No user is signed in
+                    showAuthModal();
+                }
+            });
+            
+            // Event listeners
+            setupEventListeners();
+        }
+        
+        // Set dark mode
+        function setDarkMode(enabled) {
+            state.darkMode = enabled;
+            localStorage.setItem('darkMode', enabled);
+            
+            if (enabled) {
+                document.documentElement.classList.add('dark');
+                elements.darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                document.documentElement.classList.remove('dark');
+                elements.darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        }
+        
+        // Toggle dark mode
+        function toggleDarkMode() {
+            setDarkMode(!state.darkMode);
+        }
+        
+        // Show auth modal
+        function showAuthModal() {
+            elements.authModal.classList.remove('hidden');
+            showLoginForm();
+        }
+        
+        // Hide auth modal
+        function hideAuthModal() {
+            elements.authModal.classList.add('hidden');
+        }
+        
+        // Show login form
+        function showLoginForm() {
+            elements.loginForm.classList.remove('hidden');
+            elements.registerForm.classList.add('hidden');
+            elements.forgotPasswordForm.classList.add('hidden');
+            elements.loginTab.classList.add('border-primary-500', 'text-primary-600', 'dark:text-primary-400');
+            elements.loginTab.classList.remove('border-transparent', 'text-gray-500', 'dark:text-gray-400');
+            elements.registerTab.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-400');
+            elements.registerTab.classList.remove('border-primary-500', 'text-primary-600', 'dark:text-primary-400');
+        }
+        
+        // Show register form
+        function showRegisterForm() {
+            elements.loginForm.classList.add('hidden');
+            elements.registerForm.classList.remove('hidden');
+            elements.forgotPasswordForm.classList.add('hidden');
+            elements.loginTab.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-400');
+            elements.loginTab.classList.remove('border-primary-500', 'text-primary-600', 'dark:text-primary-400');
+            elements.registerTab.classList.add('border-primary-500', 'text-primary-600', 'dark:text-primary-400');
+            elements.registerTab.classList.remove('border-transparent', 'text-gray-500', 'dark:text-gray-400');
+        }
+        
+        // Show forgot password form
+        function showForgotPasswordForm() {
+            elements.loginForm.classList.add('hidden');
+            elements.registerForm.classList.add('hidden');
+            elements.forgotPasswordForm.classList.remove('hidden');
+            elements.loginTab.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-400');
+            elements.loginTab.classList.remove('border-primary-500', 'text-primary-600', 'dark:text-primary-400');
+            elements.registerTab.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-400');
+            elements.registerTab.classList.remove('border-primary-500', 'text-primary-600', 'dark:text-primary-400');
+        }
+        
+        // Handle successful authentication
+        function handleAuthSuccess(user) {
+            state.currentUser = user;
+            updateUserUI();
+            hideAuthModal();
+            setupPresence();
+            loadUserData();
+            loadContacts();
+            
+            // Set up realtime listeners
+            setupRealtimeListeners();
+        }
+        
+        // Update user UI
+        function updateUserUI() {
+            const user = state.currentUser;
+            
+            // Set user name and email
+            const displayName = user.displayName || 'Anonymous';
+            elements.currentUserName.textContent = displayName;
+            elements.currentUserNameSmall.textContent = displayName;
+            elements.dropdownUserName.textContent = user.email;
+            
+            // Set user avatar
+            const avatarPlaceholder = displayName.charAt(0).toUpperCase();
+            elements.currentUserAvatar.innerHTML = `<span class="text-gray-600 dark:text-gray-300 font-medium">${avatarPlaceholder}</span>`;
+            elements.currentUserAvatarSmall.innerHTML = `<span class="text-gray-600 dark:text-gray-300 font-medium">${avatarPlaceholder}</span>`;
+            
+            // Set online status
+            elements.currentUserPresence.textContent = state.onlineStatus ? 'Online' : 'Offline';
+        }
+        
+        // Set up user presence
+        function setupPresence() {
+            const userId = state.currentUser.uid;
+            const userStatusRef = database.ref(`status/${userId}`);
+            const userInfoRef = database.ref(`users/${userId}`);
+            
+            // Set initial online status
+            userStatusRef.onDisconnect().set({
+                status: 'offline',
+                lastChanged: firebase.database.ServerValue.TIMESTAMP
+            }).then(() => {
+                userStatusRef.set({
+                    status: 'online',
+                    lastChanged: firebase.database.ServerValue.TIMESTAMP
+                });
+                state.onlineStatus = true;
+                elements.currentUserPresence.textContent = 'Online';
+            });
+            
+            // Update user info
+            userInfoRef.update({
+                lastOnline: firebase.database.ServerValue.TIMESTAMP,
+                online: true
+            });
+            
+            // Listen for status changes
+            userStatusRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    state.onlineStatus = data.status === 'online';
+                    elements.currentUserPresence.textContent = state.onlineStatus ? 'Online' : 'Offline';
+                }
+            });
+        }
+        
+        // Load user data
+        function loadUserData() {
+            const userId = state.currentUser.uid;
+            database.ref(`users/${userId}`).once('value').then(snapshot => {
+                const userData = snapshot.val();
+                if (!userData) {
+                    // Create user data if it doesn't exist
+                    database.ref(`users/${userId}`).set({
+                        name: state.currentUser.displayName || 'Anonymous',
+                        email: state.currentUser.email,
+                        createdAt: firebase.database.ServerValue.TIMESTAMP,
+                        lastOnline: firebase.database.ServerValue.TIMESTAMP,
+                        online: true
+                    });
+                }
+            });
+        }
+        
+        // Load contacts
+        function loadContacts() {
+            elements.contactsLoading.classList.remove('hidden');
+            elements.contactsEmpty.classList.add('hidden');
+            elements.contactsList.innerHTML = '';
+            
+            database.ref('users').on('value', snapshot => {
+                const users = snapshot.val() || {};
+                state.users = users;
+                
+                // Filter out current user
+                const otherUsers = Object.entries(users).filter(([uid]) => uid !== state.currentUser.uid);
+                
+                if (otherUsers.length === 0) {
+                    elements.contactsLoading.classList.add('hidden');
+                    elements.contactsEmpty.classList.remove('hidden');
+                    return;
+                }
+                
+                // Clear loading state
+                elements.contactsLoading.classList.add('hidden');
+                
+                // Sort by online status and name
+                otherUsers.sort((a, b) => {
+                    const aOnline = a[1].online ? 1 : 0;
+                    const bOnline = b[1].online ? 1 : 0;
+                    if (aOnline !== bOnline) return bOnline - aOnline;
+                    return a[1].name.localeCompare(b[1].name);
+                });
+                
+                // Render contacts
+                otherUsers.forEach(([uid, user]) => {
+                    const lastSeen = user.lastOnline ? dayjs(user.lastOnline).fromNow() : 'never';
+                    const isOnline = user.online;
+                    
+                    const contactElement = document.createElement('div');
+                    contactElement.className = `flex items-center space-x-3 p-3 hover:bg-gray-100 dark:hover:bg-dark-700 cursor-pointer transition-colors rounded-lg ripple`;
+                    contactElement.dataset.userId = uid;
+                    
+                    contactElement.innerHTML = `
+                        <div class="relative">
+                            <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-dark-700 flex items-center justify-center overflow-hidden ${isOnline ? 'avatar-glow' : ''}">
+                                <span class="text-gray-600 dark:text-gray-300 font-medium">${user.name.charAt(0).toUpperCase()}</span>
+                            </div>
+                            ${isOnline ? `
+                                <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-dark-800 online-pulse"></div>
+                            ` : ''}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-medium truncate">${user.name}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                ${isOnline ? 'Online' : `Last seen ${lastSeen}`}
+                            </p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2 h-2 rounded-full bg-primary-500 notification-badge hidden"></div>
+                            <i class="fas fa-chevron-right text-xs text-gray-400"></i>
+                        </div>
+                    `;
+                    
+                    contactElement.addEventListener('click', () => startPrivateChat(uid, user));
+                    elements.contactsList.appendChild(contactElement);
+                });
+            });
+        }
+        
+        // Set up realtime listeners
+        function setupRealtimeListeners() {
+            // Listen for user presence changes
+            database.ref('status').on('value', snapshot => {
+                state.userPresence = snapshot.val() || {};
+                updateContactsStatus();
+            });
+            
+            // Listen for typing indicators
+            database.ref('typing').on('value', snapshot => {
+                state.typingStatus = snapshot.val() || {};
+                updateTypingIndicator();
+            });
+        }
+        
+        // Update contacts status
+        function updateContactsStatus() {
+            const contactElements = elements.contactsList.querySelectorAll('[data-user-id]');
+            
+            contactElements.forEach(element => {
+                const userId = element.dataset.userId;
+                const user = state.users[userId];
+                const presence = state.userPresence[userId];
+                
+                if (user && presence) {
+                    const isOnline = presence.status === 'online';
+                    const lastSeen = presence.lastChanged ? dayjs(presence.lastChanged).fromNow() : 'never';
+                    
+                    // Update online indicator
+                    const onlineIndicator = element.querySelector('.online-pulse');
+                    const avatar = element.querySelector('.w-10.h-10');
+                    
+                    if (isOnline) {
+                        if (!onlineIndicator) {
+                            const indicator = document.createElement('div');
+                            indicator.className = 'absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-dark-800 online-pulse';
+                            element.querySelector('.relative').appendChild(indicator);
+                        }
+                        avatar.classList.add('avatar-glow');
+                    } else {
+                        if (onlineIndicator) onlineIndicator.remove();
+                        avatar.classList.remove('avatar-glow');
+                    }
+                    
+                    // Update status text
+                    const statusText = element.querySelector('.text-xs');
+                    if (statusText) {
+                        statusText.textContent = isOnline ? 'Online' : `Last seen ${lastSeen}`;
+                    }
+                }
+            });
+        }
+        
+        // Start a private chat
+        function startPrivateChat(userId, userData) {
+            state.activeChat = userId;
+            state.activeChatType = 'private';
+            
+            // Update UI
+            elements.emptyChatState.classList.add('hidden');
+            elements.chatHeader.classList.remove('hidden');
+            elements.messagesContainer.classList.remove('hidden');
+            elements.messageInputContainer.classList.remove('hidden');
+            
+            // Set chat partner info
+            const isOnline = state.userPresence[userId]?.status === 'online' || false;
+            const lastSeen = state.userPresence[userId]?.lastChanged ? 
+                dayjs(state.userPresence[userId].lastChanged).fromNow() : 'never';
+            
+            elements.chatPartnerName.textContent = userData.name;
+            elements.chatPartnerStatus.textContent = isOnline ? 'Online' : `Last seen ${lastSeen}`;
+            elements.chatPartnerAvatar.innerHTML = `<span class="text-gray-600 dark:text-gray-300 font-medium">${userData.name.charAt(0).toUpperCase()}</span>`;
+            
+            // Load messages
+            loadMessages();
+            
+            // On mobile, hide sidebar when chat is opened
+            if (window.innerWidth < 768) {
+                elements.sidebar.classList.remove('active');
+            }
+        }
+        
+        // Load messages for active chat
+        function loadMessages() {
+            if (!state.activeChat) return;
+            
+            elements.messagesList.innerHTML = '';
+            
+            let messagesRef;
+            if (state.activeChatType === 'private') {
+                // Private chat messages are stored under a combined ID sorted alphabetically
+                const chatId = [state.currentUser.uid, state.activeChat].sort().join('_');
+                messagesRef = database.ref(`messages/${chatId}`);
+            } else {
+                // Group chat messages
+                messagesRef = database.ref(`groupMessages/${state.activeChat}`);
+            }
+            
+            messagesRef.orderByChild('timestamp').limitToLast(100).on('value', snapshot => {
+                const messages = snapshot.val() || {};
+                state.messages[state.activeChat] = messages;
+                
+                // Clear existing messages
+                elements.messagesList.innerHTML = '';
+                
+                // Add messages to the list
+                Object.entries(messages).forEach(([messageId, message]) => {
+                    addMessageToUI(messageId, message);
+                });
+                
+                // Scroll to bottom
+                setTimeout(() => {
+                    elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+                }, 50);
+            });
+        }
+        
+        // Add a message to the UI
+        function addMessageToUI(messageId, message) {
+            const isCurrentUser = message.senderId === state.currentUser.uid;
+            const senderName = isCurrentUser ? 'You' : state.users[message.senderId]?.name || 'Unknown';
+            const timestamp = message.timestamp ? dayjs(message.timestamp).format('h:mm A') : 'Just now';
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `flex ${isCurrentUser ? 'justify-end' : 'justify-start'} message-enter`;
+            messageElement.dataset.messageId = messageId;
+            
+            messageElement.innerHTML = `
+                <div class="max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl relative group">
+                    <div class="flex ${isCurrentUser ? 'flex-row-reverse' : ''} items-end space-x-2 space-x-reverse">
+                        ${!isCurrentUser ? `
+                            <div class="w-8 h-8 rounded-full bg-gray-300 dark:bg-dark-700 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                                <span class="text-gray-600 dark:text-gray-300 font-medium">${senderName.charAt(0).toUpperCase()}</span>
+                            </div>
+                        ` : ''}
+                        <div class="relative">
+                            <div class="${isCurrentUser ? 'bg-primary-500 text-white' : 'bg-white dark:bg-dark-700'} rounded-2xl px-4 py-2 shadow-sm">
+                                <p class="break-words">${message.text}</p>
+                            </div>
+                            <div class="absolute ${isCurrentUser ? '-right-2 bottom-0' : '-left-2 bottom-0'} w-4 h-4 ${isCurrentUser ? 'bg-primary-500' : 'bg-white dark:bg-dark-700'} transform rotate-45"></div>
+                        </div>
+                    </div>
+                    <div class="flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mt-1 space-x-2 items-center">
+                        <span class="text-xs text-gray-500 dark:text-gray-400">${timestamp}</span>
+                        ${isCurrentUser ? `
+                            <span class="text-xs ${message.read ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400'}">
+                                <i class="fas fa-check-double"></i>
+                            </span>
+                        ` : ''}
+                    </div>
+                    ${isCurrentUser ? `
+                        <div class="absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1">
+                            <button class="edit-message p-1 text-gray-500 hover:text-primary-500" data-message-id="${messageId}">
+                                <i class="fas fa-edit text-xs"></i>
+                            </button>
+                            <button class="delete-message p-1 text-gray-500 hover:text-red-500" data-message-id="${messageId}">
+                                <i class="fas fa-trash-alt text-xs"></i>
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            elements.messagesList.appendChild(messageElement);
+            
+            // Add event listeners for message actions
+            if (isCurrentUser) {
+                const editBtn = messageElement.querySelector('.edit-message');
+                const deleteBtn = messageElement.querySelector('.delete-message');
+                
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    editMessage(messageId, message.text);
+                });
+                
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteMessage(messageId);
+                });
+            }
+            
+            // Add context menu
+            messageElement.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                showMessageContextMenu(e, messageId, isCurrentUser);
+            });
+            
+            // Mark as read if this is a received message
+            if (!isCurrentUser && !message.read) {
+                markMessageAsRead(messageId);
+            }
+            
+            // Play notification sound for received messages
+            if (!isCurrentUser) {
+                elements.notificationSound.play().catch(e => console.log('Audio play failed:', e));
+            }
+        }
+        
+        // Edit a message
+        function editMessage(messageId, currentText) {
+            state.editingMessageId = messageId;
+            elements.messageInput.value = currentText;
+            elements.messageInput.focus();
+            elements.sendMessageButton.innerHTML = '<i class="fas fa-check"></i>';
+        }
+        
+        // Delete a message
+        function deleteMessage(messageId) {
+            Swal.fire({
+                title: 'Delete message?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let messagesRef;
+                    if (state.activeChatType === 'private') {
+                        const chatId = [state.currentUser.uid, state.activeChat].sort().join('_');
+                        messagesRef = database.ref(`messages/${chatId}/${messageId}`);
+                    } else {
+                        messagesRef = database.ref(`groupMessages/${state.activeChat}/${messageId}`);
+                    }
+                    
+                    messagesRef.remove().then(() => {
+                        Swal.fire(
+                            'Deleted!',
+                            'Your message has been deleted.',
+                            'success'
+                        );
+                    }).catch(error => {
+                        Swal.fire('Error', error.message, 'error');
+                    });
+                }
+            });
+        }
+        
+        // Mark message as read
+        function markMessageAsRead(messageId) {
+            if (state.activeChatType === 'private') {
+                const chatId = [state.currentUser.uid, state.activeChat].sort().join('_');
+                database.ref(`messages/${chatId}/${messageId}/read`).set(true);
+            }
+        }
+        
+        // Show message context menu
+        function showMessageContextMenu(e, messageId, isCurrentUser) {
+            state.contextMenuMessageId = messageId;
+            
+            // Position the menu
+            elements.messageContextMenu.style.left = `${e.clientX}px`;
+            elements.messageContextMenu.style.top = `${e.clientY}px`;
+            elements.messageContextMenu.classList.remove('hidden');
+            
+            // Update menu options based on ownership
+            elements.editMessageButton.classList.toggle('hidden', !isCurrentUser);
+            elements.deleteMessageButton.classList.toggle('hidden', !isCurrentUser);
+            elements.copyMessageButton.classList.toggle('hidden', false);
+            
+            // Close menu when clicking elsewhere
+            const closeMenu = () => {
+                elements.messageContextMenu.classList.add('hidden');
+                document.removeEventListener('click', closeMenu);
+            };
+            
+            setTimeout(() => {
+                document.addEventListener('click', closeMenu);
+            }, 10);
+        }
+        
+        // Update typing indicator
+        function updateTypingIndicator() {
+            if (!state.activeChat || state.activeChatType !== 'private') {
+                elements.typingIndicator.classList.add('hidden');
+                return;
+            }
+            
+            const typingData = state.typingStatus[state.activeChat];
+            if (typingData && typingData.isTyping && typingData.userId !== state.currentUser.uid) {
+                elements.typingIndicator.classList.remove('hidden');
+            } else {
+                elements.typingIndicator.classList.add('hidden');
+            }
+        }
+        
+        // Send a message
+        function sendMessage() {
+            const text = elements.messageInput.value.trim();
+            if (!text || !state.activeChat) return;
+            
+            // If editing, update the message
+            if (state.editingMessageId) {
+                updateMessage(state.editingMessageId, text);
+                return;
+            }
+            
+            const message = {
+                text: text,
+                senderId: state.currentUser.uid,
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                read: false
+            };
+            
+            let messagesRef;
+            if (state.activeChatType === 'private') {
+                // For private chats, use a combined chat ID sorted alphabetically
+                const chatId = [state.currentUser.uid, state.activeChat].sort().join('_');
+                messagesRef = database.ref(`messages/${chatId}`).push();
+            } else {
+                // For group chats
+                messagesRef = database.ref(`groupMessages/${state.activeChat}`).push();
+            }
+            
+            messagesRef.set(message).then(() => {
+                // Clear input
+                elements.messageInput.value = '';
+                elements.messageInput.style.height = 'auto';
+                
+                // Scroll to bottom
+                setTimeout(() => {
+                    elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+                }, 50);
+                
+                // Reset typing indicator
+                if (state.activeChatType === 'private') {
+                    database.ref(`typing/${state.activeChat}`).set({
+                        isTyping: false,
+                        userId: state.currentUser.uid
+                    });
+                }
+                
+                // Reset editing state
+                state.editingMessageId = null;
+                elements.sendMessageButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+            }).catch(error => {
+                console.error("Error sending message: ", error);
+            });
+        }
+        
+        // Update a message
+        function updateMessage(messageId, newText) {
+            if (!state.activeChat || !messageId || !newText.trim()) return;
+            
+            let messageRef;
+            if (state.activeChatType === 'private') {
+                const chatId = [state.currentUser.uid, state.activeChat].sort().join('_');
+                messageRef = database.ref(`messages/${chatId}/${messageId}`);
+            } else {
+                messageRef = database.ref(`groupMessages/${state.activeChat}/${messageId}`);
+            }
+            
+            messageRef.update({
+                text: newText,
+                edited: true
+            }).then(() => {
+                elements.messageInput.value = '';
+                elements.sendMessageButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                state.editingMessageId = null;
+            }).catch(error => {
+                console.error("Error updating message: ", error);
+            });
+        }
+        
+        // Show new chat modal
+        function showNewChatModal() {
+            elements.newChatModal.classList.remove('hidden');
+            elements.searchNewChat.value = '';
+            elements.newChatUsersList.innerHTML = `
+                <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-users text-2xl mb-2"></i>
+                    <p>Search for users to start a new chat</p>
+                </div>
+            `;
+            
+            // Focus search input
+            setTimeout(() => {
+                elements.searchNewChat.focus();
+            }, 100);
+        }
+        
+        // Hide new chat modal
+        function hideNewChatModal() {
+            elements.newChatModal.classList.add('hidden');
+        }
+        
+        // Search users for new chat
+        function searchUsersForNewChat() {
+            const searchTerm = elements.searchNewChat.value.trim().toLowerCase();
+            if (!searchTerm) {
+                elements.newChatUsersList.innerHTML = `
+                    <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-users text-2xl mb-2"></i>
+                        <p>Search for users to start a new chat</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Filter users
+            const filteredUsers = Object.entries(state.users)
+                .filter(([uid, user]) => 
+                    uid !== state.currentUser.uid && 
+                    (user.name.toLowerCase().includes(searchTerm) || 
+                     user.email.toLowerCase().includes(searchTerm))
+                );
+            
+            if (filteredUsers.length === 0) {
+                elements.newChatUsersList.innerHTML = `
+                    <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-user-slash text-2xl mb-2"></i>
+                        <p>No users found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Display results
+            elements.newChatUsersList.innerHTML = '';
+            filteredUsers.forEach(([uid, user]) => {
+                const isOnline = state.userPresence[uid]?.status === 'online' || false;
+                
+                const userElement = document.createElement('div');
+                userElement.className = 'flex items-center space-x-3 p-3 hover:bg-gray-100 dark:hover:bg-dark-700 cursor-pointer transition-colors rounded-lg ripple';
+                userElement.dataset.userId = uid;
+                
+                userElement.innerHTML = `
+                    <div class="relative">
+                        <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-dark-700 flex items-center justify-center overflow-hidden ${isOnline ? 'avatar-glow' : ''}">
+                            <span class="text-gray-600 dark:text-gray-300 font-medium">${user.name.charAt(0).toUpperCase()}</span>
+                        </div>
+                        ${isOnline ? `
+                            <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-dark-800 online-pulse"></div>
+                        ` : ''}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-medium truncate">${user.name}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">${user.email}</p>
+                    </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                        ${isOnline ? 'Online' : 'Offline'}
+                    </div>
+                `;
+                
+                userElement.addEventListener('click', () => {
+                    startPrivateChat(uid, user);
+                    hideNewChatModal();
+                });
+                
+                elements.newChatUsersList.appendChild(userElement);
+            });
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Dark mode toggle
+            elements.darkModeToggle.addEventListener('click', toggleDarkMode);
+            
+            // Auth modal
+            elements.closeAuthModal.addEventListener('click', hideAuthModal);
+            elements.loginTab.addEventListener('click', showLoginForm);
+            elements.registerTab.addEventListener('click', showRegisterForm);
+            elements.switchToRegister.addEventListener('click', (e) => {
+                e.preventDefault();
+                showRegisterForm();
+            });
+            elements.switchToLogin.addEventListener('click', (e) => {
+                e.preventDefault();
+                showLoginForm();
+            });
+            elements.forgotPassword.addEventListener('click', (e) => {
+                e.preventDefault();
+                showForgotPasswordForm();
+            });
+            elements.backToLogin.addEventListener('click', (e) => {
+                e.preventDefault();
+                showLoginForm();
+            });
+            
+            // Login form
+            elements.loginButton.addEventListener('click', () => {
+                const email = elements.loginEmail.value.trim();
+                const password = elements.loginPassword.value.trim();
+                
+                if (!email || !password) {
+                    Swal.fire('Error', 'Please enter both email and password', 'error');
+                    return;
+                }
+                
+                showLoading();
+                auth.signInWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        hideLoading();
+                        handleAuthSuccess(userCredential.user);
+                    })
+                    .catch((error) => {
+                        hideLoading();
+                        Swal.fire('Error', error.message, 'error');
+                    });
+            });
+            
+            // Register form
+            elements.registerButton.addEventListener('click', () => {
+                const name = elements.registerName.value.trim();
+                const email = elements.registerEmail.value.trim();
+                const password = elements.registerPassword.value.trim();
+                const confirmPassword = elements.registerConfirmPassword.value.trim();
+                
+                if (!name || !email || !password || !confirmPassword) {
+                    Swal.fire('Error', 'Please fill in all fields', 'error');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    Swal.fire('Error', 'Passwords do not match', 'error');
+                    return;
+                }
+                
+                if (!elements.acceptTerms.checked) {
+                    Swal.fire('Error', 'Please accept the terms and conditions', 'error');
+                    return;
+                }
+                
+                showLoading();
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        // Update user profile
+                        return userCredential.user.updateProfile({
+                            displayName: name
+                        }).then(() => {
+                            // Create user data in database
+                            return database.ref(`users/${userCredential.user.uid}`).set({
+                                name: name,
+                                email: email,
+                                createdAt: firebase.database.ServerValue.TIMESTAMP,
+                                lastOnline: firebase.database.ServerValue.TIMESTAMP,
+                                online: true
+                            });
+                        });
+                    })
+                    .then(() => {
+                        hideLoading();
+                        handleAuthSuccess(auth.currentUser);
+                    })
+                    .catch((error) => {
+                        hideLoading();
+                        Swal.fire('Error', error.message, 'error');
+                    });
+            });
+            
+            // Forgot password
+            elements.resetPasswordButton.addEventListener('click', () => {
+                const email = elements.forgotEmail.value.trim();
+                
+                if (!email) {
+                    Swal.fire('Error', 'Please enter your email address', 'error');
+                    return;
+                }
+                
+                showLoading();
+                auth.sendPasswordResetEmail(email)
+                    .then(() => {
+                        hideLoading();
+                        Swal.fire('Success', 'Password reset email sent. Please check your inbox.', 'success');
+                        showLoginForm();
+                    })
+                    .catch((error) => {
+                        hideLoading();
+                        Swal.fire('Error', error.message, 'error');
+                    });
+            });
+            
+            // User dropdown
+            elements.userMenuButton.addEventListener('click', () => {
+                elements.userDropdownMenu.classList.toggle('hidden');
+            });
+            
+            // Logout
+            elements.logoutButton.addEventListener('click', () => {
+                auth.signOut().then(() => {
+                    // Reset state
+                    state.currentUser = null;
+                    state.activeChat = null;
+                    
+                    // Reset UI
+                    elements.emptyChatState.classList.remove('hidden');
+                    elements.chatHeader.classList.add('hidden');
+                    elements.messagesContainer.classList.add('hidden');
+                    elements.messageInputContainer.classList.add('hidden');
+                    
+                    // Show auth modal
+                    showAuthModal();
+                });
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!elements.userDropdown.contains(e.target)) {
+                    elements.userDropdownMenu.classList.add('hidden');
+                }
+            });
+            
+            // Mobile menu
+            elements.mobileMenuButton.addEventListener('click', () => {
+                elements.sidebar.classList.toggle('active');
+            });
+            
+            // Back to contacts (mobile)
+            elements.backToContacts.addEventListener('click', () => {
+                state.activeChat = null;
+                elements.emptyChatState.classList.remove('hidden');
+                elements.chatHeader.classList.add('hidden');
+                elements.messagesContainer.classList.add('hidden');
+                elements.messageInputContainer.classList.add('hidden');
+            });
+            
+            // New chat button
+            elements.newChatButton.addEventListener('click', showNewChatModal);
+            elements.startNewChatButton.addEventListener('click', showNewChatModal);
+            
+            // New chat modal
+            elements.closeNewChatModal.addEventListener('click', hideNewChatModal);
+            elements.searchNewChat.addEventListener('input', searchUsersForNewChat);
+            
+            // Message input
+            elements.messageInput.addEventListener('input', () => {
+                // Auto-resize textarea
+                elements.messageInput.style.height = 'auto';
+                elements.messageInput.style.height = `${Math.min(elements.messageInput.scrollHeight, 128)}px`;
+                
+                // Update character count
+                const length = elements.messageInput.value.length;
+                elements.messageLength.textContent = `${length}/1000`;
+                
+                // Show/hide placeholder
+                if (length > 0) {
+                    elements.messageInputPlaceholder.classList.add('hidden');
+                } else {
+                    elements.messageInputPlaceholder.classList.remove('hidden');
+                }
+                
+                // Send typing indicator for private chats
+                if (state.activeChat && state.activeChatType === 'private') {
+                    database.ref(`typing/${state.activeChat}`).set({
+                        isTyping: length > 0,
+                        userId: state.currentUser.uid
+                    });
+                    
+                    // Clear typing indicator after 3 seconds of inactivity
+                    clearTimeout(state.typingTimeout);
+                    state.typingTimeout = setTimeout(() => {
+                        database.ref(`typing/${state.activeChat}`).set({
+                            isTyping: false,
+                            userId: state.currentUser.uid
+                        });
+                    }, 3000);
+                }
+            });
+            
+            // Send message on Enter (but allow Shift+Enter for new lines)
+            elements.messageInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            // Send message button
+            elements.sendMessageButton.addEventListener('click', sendMessage);
+            
+            // Context menu actions
+            elements.editMessageButton.addEventListener('click', () => {
+                if (!state.contextMenuMessageId) return;
+                
+                const message = state.messages[state.activeChat]?.[state.contextMenuMessageId];
+                if (message) {
+                    editMessage(state.contextMenuMessageId, message.text);
+                }
+                
+                elements.messageContextMenu.classList.add('hidden');
+            });
+            
+            elements.deleteMessageButton.addEventListener('click', () => {
+                if (state.contextMenuMessageId) {
+                    deleteMessage(state.contextMenuMessageId);
+                }
+                elements.messageContextMenu.classList.add('hidden');
+            });
+            
+            elements.copyMessageButton.addEventListener('click', () => {
+                if (state.contextMenuMessageId) {
+                    const message = state.messages[state.activeChat]?.[state.contextMenuMessageId];
+                    
+                    if (message) {
+                        navigator.clipboard.writeText(message.text).then(() => {
+                            Swal.fire({
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Message copied',
+                                showConfirmButton: false,
+                                timer: 1500,
+                                toast: true
+                            });
+                        });
+                    }
+                }
+                elements.messageContextMenu.classList.add('hidden');
+            });
+            
+            // Emoji picker
+            elements.emojiPickerButton.addEventListener('click', () => {
+                // Create emoji picker
+                const picker = new EmojiMart.Picker({
+                    onEmojiSelect: (emoji) => {
+                        const input = elements.messageInput;
+                        const startPos = input.selectionStart;
+                        const endPos = input.selectionEnd;
+                        
+                        input.value = input.value.substring(0, startPos) + 
+                                      emoji.native + 
+                                      input.value.substring(endPos, input.value.length);
+                        
+                        // Set cursor position after the inserted emoji
+                        input.selectionStart = input.selectionEnd = startPos + emoji.native.length;
+                        input.focus();
+                        
+                        // Trigger input event for auto-resize
+                        const event = new Event('input', { bubbles: true });
+                        input.dispatchEvent(event);
+                    },
+                    theme: state.darkMode ? 'dark' : 'light'
+                });
+                
+                // Show picker in a popover
+                Swal.fire({
+                    html: picker,
+                    showConfirmButton: false,
+                    background: state.darkMode ? '#1e293b' : '#fff',
+                    width: '350px',
+                    padding: '0',
+                    customClass: {
+                        popup: '!p-0 !overflow-hidden'
+                    }
+                });
+            });
+            
+            // Ripple effect
+            document.addEventListener('click', function(e) {
+                const target = e.target.closest('.ripple');
+                if (!target) return;
+                
+                const rect = target.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple-effect';
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+                
+                target.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        }
+        
+        // Show loading overlay
+        function showLoading() {
+            elements.loadingOverlay.classList.remove('hidden');
+        }
+        
+        // Hide loading overlay
+        function hideLoading() {
+            elements.loadingOverlay.classList.add('hidden');
+        }
+        
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+    
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-dark-800 border-t border-gray-200 dark:border-dark-700 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+        <div class="container mx-auto px-4">
+            <p>Kynay Chat — Supreme Edition | by Farhan Kertadiwangsa</p>
+            <p class="mt-1">© ${new Date().getFullYear()} All rights reserved</p>
+        </div>
+    </footer>
+</body>
+</html>
